@@ -2,11 +2,14 @@ package workbook.practise
 import scala.annotation.tailrec
 
 //singly linked list
-abstract class LList[A] {
+abstract class LList[A] extends Transformer[A, B] {
   def head : A
   def tail: LList[A]
   def isEmpty: Boolean
   def add(element:A): LList[A]
+
+  override def transform(a: A, b: B): B = ???
+
 }
 
 class Empty[A] extends LList[A] {
@@ -30,6 +33,14 @@ class Cons[A] (override val head:A, override val tail: LList[A]) extends LList[A
 
     s"[${concatenateElements(this.tail, s"$head")}]"
   }
+}
+
+trait Predicate[T] {
+  def test(t: T): Boolean
+}
+
+trait Transformer[A, B] {
+  def transform(a:A, b:B): B
 }
 
 object LListTest {
