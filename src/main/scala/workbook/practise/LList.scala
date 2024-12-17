@@ -81,7 +81,6 @@ class StringToIntTransformer extends Transformer[String, Int] {
     s.toInt
 }
 
-
 trait Predicate[T] {
   def test(t: T): Boolean
 }
