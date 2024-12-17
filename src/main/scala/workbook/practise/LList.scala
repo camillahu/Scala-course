@@ -51,17 +51,24 @@ class Cons[A] (override val head:A, override val tail: LList[A]) extends LList[A
   }
 
   override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = {
-    val firstList: LList[B] = transformer.transform(head)
-    Cons[B](firstList.head, firstList.tail)
-    
-    tail.flatMap(transformer))
+
+    def concat(list1: LList[B], list2:LList[B]):LList[B] = {
+      if(list1.isEmpty) list2
+      else new Cons(list1.head, concat(list1.tail, list2))
+    }
+    val transformedHead = transformer.transform(head)
+    concat(transformedHead, tail.flatMap(transformer))
   }
 }
 
 class IntToListTransformer extends Transformer[Int, LList[Int]] {
   override def transform(a: Int): LList[Int] =
     new Cons(a, new Cons(a + 1, new Empty[Int]))
+}
 
+class Hello extends Transformer[String, LList[String]] {
+  override def transform(s:String): LList[String] =
+    new Cons(s, new Cons("hei, " + s, new Empty[String]))
 }
 
 class EvenPredicate extends Predicate[Int] {
@@ -90,14 +97,14 @@ object LListTest {
     val empty = new Empty[String]
     val stringInts: LList[String] = new Cons("1", new Cons("2", new Cons("3", empty)))
     val intLList = stringInts.map(new StringToIntTransformer)
+    val nameList: LList[String] = new Cons("Camilla.", new Cons("Paal.", new Cons("Line.", empty)))
 
     println(intLList.filter(new EvenPredicate))
+    println(intLList.flatMap(new IntToListTransformer))
+    println(nameList.flatMap(new Hello))
+
   }
 }
-
-
-
-
 
 //    val empty = new Empty[Int]
 //    println(empty.isEmpty)
