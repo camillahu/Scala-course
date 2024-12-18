@@ -9,6 +9,8 @@ abstract class LList[A]   {
   def isEmpty: Boolean
   def add(element:A): LList[A]
 
+  infix def ++(anotherList: LList[A]): LList[A]
+
   def map[B](transformer: Transformer[A,B]): LList[B]
   def filter(predicate: Predicate[A]): LList[A]
   def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B]
@@ -21,9 +23,11 @@ class Empty[A] extends LList[A] {
   override def add(element: A): LList[A] = new Cons[A](element, this)
   override def toString = "[]"
 
-  override def map[B](transformer: Transformer[A, B]): Empty[B] = Empty[B]
-  override def filter(predicate: Predicate[A]): Empty[A] = Empty[A]
-  override def flatMap[B](transformer: Transformer[A, LList[B]]): Empty[B] = Empty[B]
+  override infix def ++(anotherList: LList[A]):LList[A] = anotherList
+
+  override def map[B](transformer: Transformer[A, B]): LList[B] = new Empty[B]
+  override def filter(predicate: Predicate[A]): LList[A] = this
+  override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = new Empty[B]
 }
 
 //make head and tail fields, so you can override them in the parentheses.
@@ -40,35 +44,37 @@ class Cons[A] (override val head:A, override val tail: LList[A]) extends LList[A
     s"[${concatenateElements(tail, s"$head")}]"
   }
 
-  override def map[B](transformer: Transformer[A, B]): LList[B] = {
-    Cons[B](transformer.transform(head), tail.map(transformer))
+  override infix def ++(anotherList: LList[A]):LList[A] = {
+    new Cons(head, tail ++ anotherList)
   }
 
+  override def map[B](transformer: Transformer[A, B]): LList[B] = {
+    new Cons(transformer.transform(head), tail.map(transformer))
+  }
 
   override def filter(predicate: Predicate[A]): LList[A] = {
-    if(predicate.test(head)) Cons[A](head, tail.filter(predicate))
+    if(predicate.test(head)) new Cons(head, tail.filter(predicate))
     else tail.filter(predicate)
   }
 
   override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = {
-
-    def concat(list1: LList[B], list2:LList[B]):LList[B] = {
-      if(list1.isEmpty) list2
-      else new Cons(list1.head, concat(list1.tail, list2))
-    }
-    val transformedHead = transformer.transform(head)
-    concat(transformedHead, tail.flatMap(transformer))
+    transformer.transform(head) ++ tail.flatMap(transformer)
   }
+
+//  override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = {
+//    def concat(list1: LList[B], list2:LList[B]):LList[B] = {
+//      if(list1.isEmpty) list2
+//      else new Cons(list1.head, concat(list1.tail, list2))
+//    }
+//    val transformedHead = transformer.transform(head)
+//    concat(transformedHead, tail.flatMap(transformer))
+//  }
 }
 
-class IntToListTransformer extends Transformer[Int, LList[Int]] {
-  override def transform(a: Int): LList[Int] =
-    new Cons(a, new Cons(a + 1, new Empty[Int]))
-}
 
-class Hello extends Transformer[String, LList[String]] {
-  override def transform(s:String): LList[String] =
-    new Cons(s, new Cons("hei, " + s, new Empty[String]))
+
+trait Predicate[T] {
+  def test(element: T): Boolean
 }
 
 class EvenPredicate extends Predicate[Int] {
@@ -76,17 +82,23 @@ class EvenPredicate extends Predicate[Int] {
     i % 2 == 0
 }
 
-class StringToIntTransformer extends Transformer[String, Int] {
-  override def transform(s:String): Int =
-    s.toInt
-}
-
-trait Predicate[T] {
-  def test(t: T): Boolean
-}
-
 trait Transformer[A, B] {
-  def transform(a:A): B
+  def transform(value:A): B
+}
+
+class IntToListTransformer extends Transformer[Int, LList[Int]] {
+  override def transform(a: Int): LList[Int] =
+    new Cons(a, new Cons(a + 1, new Empty))
+}
+
+class Hello extends Transformer[String, LList[String]] {
+  override def transform(s: String): LList[String] =
+    new Cons(s, new Cons("hei, " + s, new Empty[String]))
+}
+
+class StringToIntTransformer extends Transformer[String, Int] {
+  override def transform(s: String): Int =
+    s.toInt
 }
 
 object LListTest {
