@@ -59,21 +59,10 @@ case class Cons[A](head:A, tail: LList[A]) extends LList[A] {
   override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = {
     transformer.transform(head) ++ tail.flatMap(transformer)
   }
-
-//  override def flatMap[B](transformer: Transformer[A, LList[B]]): LList[B] = {
-//    def concat(list1: LList[B], list2:LList[B]):LList[B] = {
-//      if(list1.isEmpty) list2
-//      else new Cons(list1.head, concat(list1.tail, list2))
-//    }
-//    val transformedHead = transformer.transform(head)
-//    concat(transformedHead, tail.flatMap(transformer))
-//  }
 }
 
-
-
-trait Predicate[T] {
-  def test(element: T): Boolean
+trait Predicate[A] {
+  def test(element: A): Boolean
 }
 
 case object EvenPredicate extends Predicate[Int] {
@@ -100,18 +89,39 @@ case object StringToIntTransformer extends Transformer[String, Int] {
     s.toInt
 }
 
+case object IsNumber2 extends Predicate[Int] {
+  override def test(i: Int): Boolean =
+    i == 2
+}
+
+case object IsNumber10 extends Predicate[Int] {
+  override def test(i: Int): Boolean =
+    i == 10
+}
+
+object LList {
+  def find[A](list: LList[A], predicate: Predicate[A]): A = {
+    if(list.isEmpty) throw new NoSuchElementException
+    else if (predicate.test(list.head)) list.head
+    else find(list.tail, predicate)
+  }
+}
+
 object LListTest {
 
   def main(args: Array[String]): Unit = {
 
-    val stringInts: LList[String] = Cons("1", Cons("2", Cons("3", Empty())))
+    val stringInts: LList[String] = Cons("1", Cons("2", Cons("3", Cons("4", Empty()))))
     val intLList = stringInts.map(StringToIntTransformer)
     val nameList: LList[String] = Cons("Camilla.", Cons("Paal.", Cons("Line.", Empty())))
 
-    println(intLList.filter(EvenPredicate))
-    println(intLList.flatMap(IntToListTransformer))
-    println(nameList.flatMap(Hello))
+//    println(intLList.filter(EvenPredicate))
+//    println(intLList.flatMap(IntToListTransformer))
+//    println(nameList.flatMap(Hello))
 
+    //find test
+    println(LList.find(intLList, EvenPredicate))
+//    println(LList.find(intLList, IsNumber10))
   }
 }
 
