@@ -60,6 +60,62 @@ case class Cons[A](head:A, tail: LList[A]) extends LList[A] {
   }
 }
 
+object LList {
+  def find[A](list: LList[A], predicate: A => Boolean): A = {
+    if(list.isEmpty) throw new NoSuchElementException
+    else if (predicate(list.head)) list.head
+    else find(list.tail, predicate)
+  }
+}
+
+object LListTest {
+
+  def main(args: Array[String]): Unit = {
+
+    //NEW TESTS
+    val intList: LList[Int] = Cons(1, Cons(2, Cons(3, Cons(4, Empty()))))
+
+    //map test
+    val doubler_v2: Int => Int = _ * 2
+    println(intList.map(doubler_v2))
+
+    //filter test
+    val evenPredicate_v2: Int => Boolean = _ % 2 == 0
+    println(intList.filter(evenPredicate_v2))
+
+    //flatmap test
+    val doublerList_v2: Int => LList[Int] = x => Cons(x, Cons(x * 2, Empty()))
+    println(intList.flatMap(doublerList_v2))
+  }
+}
+
+
+//    // map test
+//    val stringInts: LList[String] = Cons("1", Cons("2", Cons("3", Cons("4", Empty()))))
+//    val intLList = stringInts.map(StringToIntTransformer)
+//    val doubler = new Function1[Int, Int] {
+//      override def apply(i: Int) = i * 2
+//    }
+//
+//    //filter test
+//    println(intLList.filter(EvenPredicate))
+//    val evenPredicate = new Function1[Int, Boolean] {
+//      override def apply(i:Int) = i % 2 == 0
+//    }
+//
+//
+//    //flatMap test
+//    val nameList: LList[String] = Cons("Camilla.", Cons("Paal.", Cons("Line.", Empty())))
+//    println(intLList.flatMap(IntToListTransformer))
+//    println(nameList.flatMap(Hello))
+//    val doublerList = new Function1[Int, LList[Int]] {
+//    override def apply(i: Int) = Cons(i, Cons(i * 2, Empty()))
+//
+//    //find test
+//    println(LList.find(intLList, EvenPredicate))
+//    println(LList.find(intLList, IsNumber10))
+
+
 //(replaced with function types)
 //trait Predicate[A] {
 //  def test(element: A): Boolean
@@ -103,57 +159,5 @@ case class Cons[A](head:A, tail: LList[A]) extends LList[A] {
 //  override def test(i: Int): Boolean =
 //    i == 10
 //}
-
-object LList {
-  def find[A](list: LList[A], predicate: A => Boolean): A = {
-    if(list.isEmpty) throw new NoSuchElementException
-    else if (predicate(list.head)) list.head
-    else find(list.tail, predicate)
-  }
-}
-
-object LListTest {
-
-  def main(args: Array[String]): Unit = {
-
-//    // map test
-//    val stringInts: LList[String] = Cons("1", Cons("2", Cons("3", Cons("4", Empty()))))
-//    val intLList = stringInts.map(StringToIntTransformer)
-//
-//    //filter test
-//    println(intLList.filter(EvenPredicate))
-//
-//
-//    //flatMap test
-//    val nameList: LList[String] = Cons("Camilla.", Cons("Paal.", Cons("Line.", Empty())))
-//    println(intLList.flatMap(IntToListTransformer))
-//    println(nameList.flatMap(Hello))
-//
-//    //find test
-//    println(LList.find(intLList, EvenPredicate))
-//    println(LList.find(intLList, IsNumber10))
-
-    //NEW TESTS
-    val intList: LList[Int] = Cons(1, Cons(2, Cons(3, Cons(4, Empty()))))
-
-    //map test
-    val doubler = new Function1[Int, Int] {
-      override def apply(i: Int) = i * 2
-    }
-    println(intList.map(doubler))
-
-    //filter test
-    val evenPredicate = new Function1[Int, Boolean] {
-      override def apply(i:Int) = i % 2 == 0
-    }
-    println(intList.filter(evenPredicate))
-
-    //flatmap test
-    val doublerList = new Function1[Int, LList[Int]] {
-      override def apply(i: Int) = Cons(i, Cons(i * 2, Empty()))
-    }
-    println(intList.flatMap(doublerList))
-  }
-}
 
 

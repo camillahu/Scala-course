@@ -68,6 +68,19 @@ object WhatsAFunction {
     override def apply(x: Int) = (y: Int) => x + y
   }
 
+  val superAdder_v3: Int => Int => Int = x => y => x + y //chatgpt
+  // Int => Int => Int -- represents a curried function
+  // The first Int is the input to the outer function
+  // The second Int (Int => Int) is the type of the function returned by the outer function
+  // The third Int is the result of applying the inner function
+
+  //x => y => x + y
+  //x=> -- The outer lambda takes an Int (x) and returns a function
+  //y => x + y -- The inner lambda takes another Int (y) and returns the sum of x + y.
+
+  val superAdder_v4 = (x: Int) => (y: Int) => x + y
+
+
   //currying
   val adder2 = superAdder_v2(2)
   val anAddition_v2 = adder2(67) // 69

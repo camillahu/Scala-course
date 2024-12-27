@@ -28,7 +28,9 @@ object AnonymousFunctions {
   val adder_v2: (Int, Int) => Int = (x, y) => x + y
 
   //shortest lambdas
-  val doubler_v4: Int => Int = _ * 2 //x => x * 2
+  val doubler_v4: Int => Int = _ * 2 //x => x * 2 -- underscore is whatever x is.
+  val adder_v3: (Int, Int) => Int = _ + _ // (x, y) => x + y -- we don't care about how the args are called
+  //each underscore is a different argument. 
 
   def main(args: Array[String]): Unit = {
     println(anInvocation)
