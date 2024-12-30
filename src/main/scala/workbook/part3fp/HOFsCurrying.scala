@@ -66,5 +66,4 @@ object HOFsCurrying {
     println(preciseFormat(Math.PI))
     // println(tenThousand_v2) --stackoverflow
   }
-
 }

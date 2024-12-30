@@ -14,6 +14,7 @@ abstract class LList[A]   {
   def map[B](transformer: A => B): LList[B]
   def filter(predicate: A => Boolean): LList[A]
   def flatMap[B](transformer: A => LList[B]): LList[B]
+  def foreach(applyUnit: A => Unit): Unit
 }
 
 case class Empty[A]() extends LList[A] {
@@ -27,6 +28,7 @@ case class Empty[A]() extends LList[A] {
   override def map[B](transformer: A => B): LList[B] = Empty[B]()
   override def filter(predicate: A => Boolean): LList[A] = this
   override def flatMap[B](transformer: A => LList[B]): LList[B] = Empty[B]()
+  override def foreach(applyUnit: A => Unit): Unit = println()
 }
 
 case class Cons[A](head:A, tail: LList[A]) extends LList[A] {
@@ -58,6 +60,11 @@ case class Cons[A](head:A, tail: LList[A]) extends LList[A] {
   override def flatMap[B](transformer:A => LList[B]): LList[B] = {
     transformer(head) ++ tail.flatMap(transformer)
   }
+
+  override def foreach(applyTo: A => Unit): Unit = {
+    applyTo(head)
+    tail.foreach(applyTo)
+  }
 }
 
 object LList {
@@ -86,8 +93,17 @@ object LListTest {
     //flatmap test
     val doublerList_v2: Int => LList[Int] = x => Cons(x, Cons(x * 2, Empty()))
     println(intList.flatMap(doublerList_v2))
+
+    //foreach test
+    val printHeart: Int => Unit = x => print(s"$x <3 ")
+    intList.foreach(printHeart)
   }
 }
+
+
+
+
+
 
 
 //    // map test
