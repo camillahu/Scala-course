@@ -24,6 +24,10 @@ abstract class LList[A] {
   def foreach(applyUnit: A => Unit): Unit
 
   def sort(sorter: (A, A) => Int): LList[A]
+
+  def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList [B]
+
+
 }
 
 case class Empty[A]() extends LList[A] {
@@ -46,6 +50,8 @@ case class Empty[A]() extends LList[A] {
   override def foreach(applyUnit: A => Unit): Unit = println()
 
   override def sort(sorter: (A, A) => Int): LList[A] = this
+
+  override def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList[B] = Empty[B]()
 }
 
 case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
@@ -92,6 +98,14 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
     if (tail.isEmpty) this
     else insert(head, tail.sort(sorter))
   }
+
+  override def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList[B] = {
+    def zip(thisList: LList[A], anotherList: LList[A]): LList[B] = {
+      if(anotherList.isEmpty || thisList.isEmpty) Empty[B]()
+      else Cons(zipper(thisList.head, anotherList.head), zip(thisList.tail, anotherList.tail))
+    }
+    zip(this, aList)
+  }
 }
 
   object LList {
@@ -108,6 +122,11 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
 
       //NEW TESTS
       val intList: LList[Int] = Cons(1, Cons(2, Cons(3, Cons(4, Empty()))))
+
+      //zipWith test
+      val intList_v3: LList[Int] = Cons(5, Cons(6, Cons(7, Cons(8, Empty()))))
+      val aZipper: (Int, Int) => Int = _ * _
+      println(intList.zipWith(intList_v3, aZipper))
 
       //map test
       val doubler_v2: Int => Int = _ * 2
@@ -129,6 +148,8 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
       val intList_v2: LList[Int] = Cons(5, Cons(3, Cons(1, Cons(8, Empty()))))
       val aSorter: (Int, Int) => Int = _ - _
       println(intList_v2.sort(aSorter))
+
+
     }
 }
 
