@@ -1,6 +1,7 @@
 package workbook.practise
 
 import scala.annotation.tailrec
+import scala.runtime.Nothing$
 import scala.util.Try
 
 //singly linked list
@@ -21,19 +22,19 @@ abstract class LList[A] {
 
   def flatMap[B](transformer: A => LList[B]): LList[B]
 
-  def foreach(applyUnit: A => Unit): Unit
+  def foreach(f: A => Unit): Unit
 
-  def sort(sorter: (A, A) => Int): LList[A]
+  def sort(compare: (A, A) => Int): LList[A]
 
-  def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList [B]
+  def zipWith[B, T](list: LList[T], zipper: (A, T) => B): LList [B]
 
-
+  def foldLeft[B](start:B)(operator:(B, A) => B): B
 }
 
 case class Empty[A]() extends LList[A] {
   override def head: A = throw new NoSuchElementException("Empty list has no head")
 
-  override def tail: LList[A] = throw new UnsupportedOperationException(("Empty list has no tail"))
+  override def tail: LList[A] = throw new UnsupportedOperationException("Empty list has no tail")
 
   override def isEmpty: Boolean = true
 
@@ -47,11 +48,15 @@ case class Empty[A]() extends LList[A] {
 
   override def flatMap[B](transformer: A => LList[B]): LList[B] = Empty[B]()
 
-  override def foreach(applyUnit: A => Unit): Unit = println()
+  override def foreach(applyUnit: A => Unit): Unit = () //unit return type
 
   override def sort(sorter: (A, A) => Int): LList[A] = this
 
-  override def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList[B] = Empty[B]()
+  override def zipWith[B, T](list: LList[T], zipper: (A, T) => B) =
+    if (!list.isEmpty) throw new IllegalArgumentException("Zipping lists of nonequal length")
+    else Empty()
+
+  override def foldLeft[B](start: B)(operator: (B, A) => B) = start
 }
 
 case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
@@ -85,26 +90,28 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
     transformer(head) ++ tail.flatMap(transformer)
   }
 
-  override def foreach(applyTo: A => Unit): Unit = {
-    applyTo(head)
-    tail.foreach(applyTo)
+  override def foreach(f: A => Unit): Unit = {
+    f(head)
+    tail.foreach(f)
   }
 
-  override def sort(sorter: (A, A) => Int): LList[A] = {
-    def insert(thisElement: A, sortedList: LList[A]): LList[A] = {
-      if (sortedList.isEmpty || sorter(thisElement, sortedList.head) <= 0) Cons(thisElement, sortedList)
-      else Cons(sortedList.head, insert(thisElement, sortedList.tail))
+  override def sort(compare: (A, A) => Int): LList[A] = {
+    def insert(elem: A, sortedList: LList[A]): LList[A] = {
+      if (sortedList.isEmpty) Cons(elem, Empty())
+      else if (compare(elem, sortedList.head) <= 0) Cons(elem, sortedList)
+      else Cons(sortedList.head, insert(elem, sortedList.tail))
     }
-    if (tail.isEmpty) this
-    else insert(head, tail.sort(sorter))
+    val sortedTail = tail.sort(compare)
+    insert(head, sortedTail)
   }
 
-  override def zipWith[B](aList: LList[A], zipper: (A, A) => B): LList[B] = {
-    def zip(thisList: LList[A], anotherList: LList[A]): LList[B] = {
-      if(anotherList.isEmpty || thisList.isEmpty) Empty[B]()
-      else Cons(zipper(thisList.head, anotherList.head), zip(thisList.tail, anotherList.tail))
-    }
-    zip(this, aList)
+  override def zipWith[B, T](list: LList[T], zip: (A, T) => B): LList[B] = {
+    if(list.isEmpty) throw new IllegalArgumentException("Zipping lists of non-equal length")
+    else Cons(zip(head, list.head), tail.zipWith(list.tail, zip))
+  }
+
+  override def foldLeft[B](start: B)(operator: (B, A) => B) = {
+    tail.foldLeft(operator(start, head))(operator)
   }
 }
 
@@ -122,6 +129,12 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
 
       //NEW TESTS
       val intList: LList[Int] = Cons(1, Cons(2, Cons(3, Cons(4, Empty()))))
+
+      //foldLeft test
+      val aFolder: (Int, Int) => Int = _ + _
+      println(intList.foldLeft(0)(aFolder))
+      val aFolder_v2: (Int, Int) => Int = _ - _
+      println(intList.foldLeft(0)(aFolder_v2))
 
       //zipWith test
       val intList_v3: LList[Int] = Cons(5, Cons(6, Cons(7, Cons(8, Empty()))))
@@ -148,8 +161,6 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
       val intList_v2: LList[Int] = Cons(5, Cons(3, Cons(1, Cons(8, Empty()))))
       val aSorter: (Int, Int) => Int = _ - _
       println(intList_v2.sort(aSorter))
-
-
     }
 }
 

@@ -59,11 +59,19 @@ object HOFsCurrying {
   val standardFormat: Double => String = curriedFormatter("%4.2f") // same as (x:Double) => "%4.2f".format(x)
   val preciseFormat: Double => String = curriedFormatter("%10.8f") // same as (x:Double) => "%10.8f".format(x)
 
+  //exercises
+
+  def toCurry(f:(Int, Int) => Int): Int => Int => Int = (x: Int) => (y:Int) => x + y
+  def fromCurry(f:(Int => Int => Int)): (Int, Int) => Int = (x:Int, y:Int) => x + y
+
+  def compose(f,g) => x => f(g(x)) =
+
+
 
   def main(args: Array[String]): Unit = {
-    println(tenThousand)
-    println(standardFormat(Math.PI))
-    println(preciseFormat(Math.PI))
+//    println(tenThousand)
+//    println(standardFormat(Math.PI))
+//    println(preciseFormat(Math.PI))
     // println(tenThousand_v2) --stackoverflow
   }
 }
