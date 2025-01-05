@@ -61,10 +61,37 @@ object HOFsCurrying {
 
   //exercises
 
-  def toCurry(f:(Int, Int) => Int): Int => Int => Int = (x: Int) => (y:Int) => x + y
-  def fromCurry(f:(Int => Int => Int)): (Int, Int) => Int = (x:Int, y:Int) => x + y
+  def toCurry(f:(Int, Int) => Int): Int => Int => Int =
+    (x: Int) => (y:Int) => f(x, y)
 
-  def compose(f,g) => x => f(g(x)) =
+  def toCurryGeneralized[A, B, C](f: (A, B) => C): A => B => C =
+    (x: A) => (y: B) => f(x, y)  //must specify type on implementation
+
+  val superAdder_v2 = toCurry((x,y) => x + y) //implementation 1
+  val superAdder_v3 = toCurry(_ + _) //implementation 2 -- shortest version
+
+  def fromCurry(f:Int => Int => Int): (Int, Int) => Int =
+    (x:Int, y:Int) => f(x)(y)
+
+  val simpleAdder = fromCurry(superAdder)
+
+  def compose(f: Int => Int, g: Int => Int): Int => Int =
+    x => f(g(x))
+
+  def andThen(f: Int => Int, g: Int => Int): Int => Int =
+    x => g(f(x))
+
+  def generalizedCompose[A, B, C](f: B => C, g: A => B): A => C =
+    x => f(g(x))
+
+  def generalizedAndThen[A, B, C](f: A => B, g: B => C): A => C =
+    x => g(f(x))
+
+
+  val incrementer = (x:Int) => x + 1
+  val doubler = (x:Int) => x * 2
+  val composedApplication = compose(incrementer, doubler)
+  val aSequencedApplication = andThen(incrementer, doubler)
 
 
 
@@ -73,5 +100,9 @@ object HOFsCurrying {
 //    println(standardFormat(Math.PI))
 //    println(preciseFormat(Math.PI))
     // println(tenThousand_v2) --stackoverflow
+
+    println(simpleAdder(2, 78))
+    println(composedApplication(14)) // 29 = 2 * 14 + 1 -- 14
+    println(aSequencedApplication(14)) // 29 = (1 + 14) * 2 -- 15
   }
 }
