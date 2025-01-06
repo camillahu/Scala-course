@@ -19,6 +19,7 @@ abstract class LList[A] {
   def map[B](transformer: A => B): LList[B]
 
   def filter(predicate: A => Boolean): LList[A]
+  def withFilter(predicate: A => Boolean): LList[A] = filter(predicate)
 
   def flatMap[B](transformer: A => LList[B]): LList[B]
 
@@ -115,6 +116,7 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
   }
 }
 
+
   object LList {
     def find[A](list: LList[A], predicate: A => Boolean): A = {
       if (list.isEmpty) throw new NoSuchElementException
@@ -122,6 +124,8 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
       else find(list.tail, predicate)
     }
   }
+
+
 
   object LListTest {
 
@@ -154,13 +158,14 @@ case class Cons[A](head: A, tail: LList[A]) extends LList[A] {
       println(intList.flatMap(doublerList_v2))
 
       //foreach test
-      val printHeart: Int => Unit = x => print(s"$x <3 ")
+      val printHeart: Int => Unit = x => println(s"$x <3 ")
       intList.foreach(printHeart)
 
       //sort test
       val intList_v2: LList[Int] = Cons(5, Cons(3, Cons(1, Cons(8, Empty()))))
       val aSorter: (Int, Int) => Int = _ - _
       println(intList_v2.sort(aSorter))
+
     }
 }
 
