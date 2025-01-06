@@ -28,20 +28,30 @@ object MapFlatMapFilterFor {
 
   //same as superList- use for-comprehensions for better readability
   val combinations = numbers.flatMap(number => chars.flatMap(char => colors.map(color => s"\n$number$char - $color")))
+  val combinationsEven = numbers.filter(_ % 2 == 0).flatMap(number => chars.flatMap(char => colors.map(color => s"\n$number$char - $color")))
 
-  //for-comprehensions
-
+  //for-comprehensions-- expressions NOT iteration
   val combinationsFor = for {
-    number <- numbers
+    number <- numbers if number % 2 == 0 //does same thing as combinationsEven.
     char <- chars
     color <- colors
   } yield s"$number$char - $color"
     // for every number in numbers, every char in chars and every color in colors yield(return) interpolated string
     // and return them all under the same collection.
+    // every line works as a flatMap, except the last which is a map.
+
+
+
 
   def main(args: Array[String]): Unit = {
 //    print(combinations)
-    print(combinationsFor)
+//    print(combinationsFor)
+
+    // for comp with side effects(returning unit)
+    numbers.foreach(println)
+    for {
+      num <- numbers
+    } println(num)
   }
 
 }
