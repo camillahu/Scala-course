@@ -85,7 +85,7 @@ object LinearCollections {
     val aDiffSet_v2 = aSet -- anotherSet //same
     //intersection
     val anIntersection = aSet.intersect(anotherSet) // 4, 5
-    val anIntersection_v2 = aSet && anotherSet // 4, 5
+    val anIntersection_v2 = aSet & anotherSet // 4, 5
   }
 
   def main(args: Array[String]): Unit = {

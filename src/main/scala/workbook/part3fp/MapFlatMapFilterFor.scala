@@ -41,7 +41,6 @@ object MapFlatMapFilterFor {
     // every line works as a flatMap, except the last which is a map.
 
 
-
   //exercises
   import workbook.practise.*
   val lSimpleNumbers = Cons(1, Cons(2, Cons(3, Empty())))
