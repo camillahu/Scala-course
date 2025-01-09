@@ -61,7 +61,6 @@ object TuplesMapsExercisesSolution {
     }
 
     def isConnected(network: Map[String, Set[String]], person1: String, person2: String): Boolean = {
-      @tailrec
       def connection(current: String, visited: Set[String]): Boolean = {
         if (current == person2) true
         else if (visited.contains(current)) false
