@@ -3,7 +3,7 @@ package workbook.practise
 object TuplesMapsExercises {
 
   val aNetwork: Map[String, Set[String]] = Map(
-    "Camilla" -> Set("Camilla", "Leo"),
+    "Camilla" -> Set("Paal", "Leo"),
     "Paal" -> Set("Camilla", "Stian"),
     "Stian" -> Set("Paal"),
     "Leo" -> Set("Camilla", "Cath", "Thekla"),
@@ -53,27 +53,34 @@ object TuplesMapsExercises {
     network.count(p => p._2.isEmpty)
   }
 
-  def isConnected(network: Map[String, Set[String]]): Boolean = ???
+  def isConnected(network: Map[String, Set[String]], person1: String, person2: String): Boolean =  {
+    def connection(current: String, visited: Set[String]): Boolean = {
+      if (current == person2) true
+      else if (visited.contains(current)) false
+      else network(current).exists(friend => connection(friend, visited + current))
+    }
+    connection(person1, Set())
+  }
 
   def main(args: Array[String]): Unit = {
 
-//    //add person test
-//    val addPersonToNetwork: Map[String, Set[String]] = addPerson(aNetwork, "Line")
-//    println(addPersonToNetwork)
-//
-//    //remove person test
-//    val removePersonFromNetwork: Map[String, Set[String]] = removePerson(aNetwork, "Leo")
-//    println(removePersonFromNetwork)
-//
-//    //add friends test
-//    val addFriends: Map[String, Set[String]] = addFriendRelationship(addPersonToNetwork, "Camilla", "Line")
-//    println(addFriends)
-//
-//    //remove friends test
-//    val removeFriends: Map[String, Set[String]] = removeFriendRelationship(aNetwork, "Camilla", "Paal")
-//    println(removeFriends)
+    //add person test
+    val addPersonToNetwork: Map[String, Set[String]] = addPerson(aNetwork, "Line")
+    println(addPersonToNetwork)
 
-    //num of friends test
+    //remove person test
+    val removePersonFromNetwork: Map[String, Set[String]] = removePerson(aNetwork, "Leo")
+    println(removePersonFromNetwork)
+
+    //add friends test
+    val addFriends: Map[String, Set[String]] = addFriendRelationship(addPersonToNetwork, "Camilla", "Line")
+    println(addFriends)
+
+    //remove friends test
+    val removeFriends: Map[String, Set[String]] = removeFriendRelationship(aNetwork, "Camilla", "Paal")
+    println(removeFriends)
+
+    // num of friends test
     val camillaNumOfFriends: Int = numOfFriends(aNetwork, "Camilla")
     println(s"Camilla has $camillaNumOfFriends friends.")
 
@@ -86,6 +93,13 @@ object TuplesMapsExercises {
     println(s"$hasNoFriends people have no friends")
 
     //are they connected through friends?
-    val hasConnection = ???
+    val hasConnection = isConnected(aNetwork, "Thekla", "Paal")
+    val hasNoConnection = isConnected(aNetwork, "Paal", "Guro")
+
+    if (hasConnection) println(s"The persons have a connection")
+    else println("No connection found")
+    if(hasNoConnection) println(s"The persons have a connection")
+    else println("No connection found")
+
   }
 }
