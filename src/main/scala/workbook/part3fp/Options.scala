@@ -53,7 +53,7 @@ object Options {
   val marysPhoneNumber = phoneBook.get("Mary") //None -- no need to crash, check for nulls or if Mary is present.
 
   //exercise
-  val aConfig: Map[String, String] = Map(
+  val config: Map[String, String] = Map(
     "host" -> "176.45.32.1",
     "port" -> "8081"
   )
@@ -70,15 +70,25 @@ object Options {
       else None
   }
 
+  val host = config.get("host")
+  val port = config.get("port")
+  val connection = host.flatMap(h => port.flatMap(p => Connection(h, p)))
+  val connStatus = connection.map(_.connect())
 
+  val connStatus_v2 =
+    config.get("host").flatMap(h =>
+    config.get("port").flatMap(p =>
+    Connection(h, p).map(_.connect())
+      )
+    )
 
-
-
-
+  val connStatus_v3 = for {
+      h <- config.get("host")
+      p <- config.get("port")
+      conn <- Connection(h, p)
+    } yield conn.connect()
 
   def main(args: Array[String]): Unit = {
-    val host = aConfig("host")
-    val port = aConfig("port")
-    
+    println(connStatus_v3.getOrElse("Failed to establish connection"))
   }
 }
