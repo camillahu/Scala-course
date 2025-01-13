@@ -16,6 +16,7 @@ object PatternMatching {
 
   //decompose values
   case class Person(name: String, age: Int)
+
   val bob = Person("Bob", 20)
 
   //must be a CASE class to work with pattern matching like this.
@@ -31,7 +32,9 @@ object PatternMatching {
 
   //PM on sealed hierarchies
   sealed class Animal
+
   case class Dog(breed: String) extends Animal
+
   case class Cat(meowStyle: String) extends Animal
 
   val anAnimal: Animal = Dog("Terra Nova")
@@ -42,16 +45,36 @@ object PatternMatching {
   }
 
   //exercise
-  trait Expr
-  case class Number(n:Int) extends Expr
-  case class Sum(e1: Expr, e2: Expr)
-  case class Prod(e1: Expr, e2: Expr)
+  sealed trait Expr
 
-  def show(expr: Expr): String = ???
+  case class Number(n: Int) extends Expr
+
+  case class Sum(e1: Expr, e2: Expr) extends Expr
+
+  case class Prod(e1: Expr, e2: Expr) extends Expr
+
+  def show(expr: Expr): String =
+    expr match {
+      case Number(n) => s"$n"
+      case Sum(left, right) => show(left) + " + " + show(right)
+      case Prod(left, right) => {
+        def maybeShowParentheses(exp: Expr): String = exp match {
+          case Prod(_, _) => show(exp)
+          case Number(_) => show(exp)
+          case Sum(_, _) => s"(${show(exp)})"
+        }
+
+        maybeShowParentheses(left) + " * " + maybeShowParentheses(right)
+      }
+    }
 
 
   def main(args: Array[String]): Unit = {
     println(description)
     println(greeting)
+    println(show(Sum(Number(2), Number(3))))
+    println(show(Sum(Sum(Number(2), Number(3)), Number(4))))
+    println(show(Prod(Sum(Number(2), Number(3)), Number(4))))
+    println(show(Sum(Prod(Number(2), Number(3)), Number(4))))
   }
 }
