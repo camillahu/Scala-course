@@ -60,7 +60,43 @@ object AllThePatterns {
     case head :: tail => "deconstructed list"
   }
 
-  def main(args: Array[String]): Unit = {
+  //6 - type specifiers
+  val unknown: Any = 2
+  val matchTyped = unknown match {
+    case anInt: Int => s"I matched an int, I can add 2 to it: ${anInt + 2}"
+    case aString: String => "I matched a string"
+    case _: Double => "I matched a double I don't care about"
+  }
 
+  //7- name binding
+  val bindingNames = aList match {
+    case Cons(head, rest @Cons(_, tail)) => s"Can use $rest"
+  }
+
+  //8 -chained patterns
+  val multiMatch = aList match {
+    case Empty() | Cons(0, _) => "an empty list to me"
+    case _ => "no match found"
+  }
+
+  //9 - if guards
+  val secondElementSpecial = aList match {
+  case Cons(_, Cons(specialElement, _)) if specialElement > 5 => "second element is big enough"
+  case _ => "no match found"
+  }
+
+  //anit-pattern-- do not use!
+  val aSimpleInt = 45
+  val isEven = aSimpleInt match {
+    case n if n % 2 == 0 => true
+    case _ => false
+  }
+  //use this again!
+  val isEvenInt = aSimpleInt % 2 == 0
+
+
+
+  def main(args: Array[String]): Unit = {
+    println(isEvenInt)
   }
 }
