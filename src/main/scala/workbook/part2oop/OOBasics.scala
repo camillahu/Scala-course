@@ -3,7 +3,7 @@ package workbook.part2oop
 object OOBasics {
 
   //classes
-  class Person(val name:String, val age:Int) { // constructor signature
+  class Person(val name: String, val age: Int) { // constructor signature
     //fields
     val allCaps = name.toUpperCase()
 
@@ -17,7 +17,7 @@ object OOBasics {
     //an overload method has to have either different argument types or number of arguments.
     def greet(): String =
       s"Hi, everyone. My name is $name"
-      //this. keyword is not needed in this instance, the compiler understands what name is referring to.
+    //this. keyword is not needed in this instance, the compiler understands what name is referring to.
 
     // aux constructor (quite rarely used, basically the same as default values.)
     def this(name: String) =
